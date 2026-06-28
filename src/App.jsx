@@ -15,6 +15,7 @@ import HomeScreen from "./screens/HomeScreen";
 import CalendarScreen from "./screens/CalendarScreen";
 import ContentScreen from "./screens/ContentScreen";
 import AnalyticsScreen from "./screens/AnalyticsScreen";
+import SkillsScreen from "./screens/SkillsScreen";
 
 function Loader({ text }) {
   return (
@@ -67,6 +68,7 @@ function Dashboard({ user, name, signOut }) {
       {screen === "content" && <ContentScreen items={items} setDetail={setDetail} setShowAdd={openNew} isDesktop={isDesktop} />}
       {screen === "calendar" && <CalendarScreen items={items} detail={detail} setDetail={setDetail} setShowAdd={openNew} onDelete={handleDelete} onEdit={openEdit} isDesktop={isDesktop} />}
       {screen === "analytics" && <AnalyticsScreen items={items} isDesktop={isDesktop} />}
+      {screen === "skills" && <SkillsScreen isDesktop={isDesktop} />}
 
       {detail && screen !== "calendar" && (
         <div style={{ padding: "0 16px", maxWidth: 880, margin: "0 auto" }}>

@@ -1,4 +1,4 @@
-import { Home, LayoutGrid, Calendar, BarChart2, Plus, Sparkles, LogOut } from "lucide-react";
+import { Home, LayoutGrid, Calendar, BarChart2, Plus, Sparkles, Wand2, LogOut } from "lucide-react";
 import { C } from "../theme";
 import { useAuth } from "../lib/useAuth";
 
@@ -9,6 +9,7 @@ export default function Sidebar({ screen, setScreen, setShowAdd }) {
     { id: "content", icon: <LayoutGrid size={20} />, label: "Conteúdos" },
     { id: "calendar", icon: <Calendar size={20} />, label: "Calendário" },
     { id: "analytics", icon: <BarChart2 size={20} />, label: "Análises" },
+    { id: "skills", icon: <Wand2 size={20} />, label: "Skills" },
   ];
   const initials = (name || "?").trim().slice(0, 2).toUpperCase();
 
