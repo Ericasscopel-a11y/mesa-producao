@@ -39,11 +39,10 @@ export const PL = {
   instagram: { abbr: "IG", color: "#C13584", label: "Instagram" },
   tiktok:    { abbr: "TK", color: "#111111", label: "TikTok" },
   youtube:   { abbr: "YT", color: "#CC0000", label: "YouTube" },
-  linkedin:  { abbr: "LI", color: "#0077B5", label: "LinkedIn" },
 };
 
 export const THUMB = {
-  instagram: "#E8D0BC", tiktok: "#C8CCDC", youtube: "#E4C4BC", linkedin: "#BED0E4",
+  instagram: "#E8D0BC", tiktok: "#C8CCDC", youtube: "#E4C4BC",
 };
 
 export const IDEAS = [

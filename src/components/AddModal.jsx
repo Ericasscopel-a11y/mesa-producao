@@ -40,7 +40,7 @@ export default function AddModal({ onClose, onSave, initial, prefill }) {
   const audioSupported = canRecordAudio();
 
   const upd = (k, v) => setForm((f) => ({ ...f, [k]: v }));
-  const typeOpts = { instagram: ["Reels", "Carrossel", "Stories", "Post"], tiktok: ["Vídeo", "Stories"], youtube: ["Vídeo", "Shorts"], linkedin: ["Post", "Artigo"] };
+  const typeOpts = { instagram: ["Reels", "Carrossel", "Stories", "Post"], tiktok: ["Vídeo", "Stories"], youtube: ["Vídeo", "Shorts"] };
 
   useEffect(() => () => {
     clearInterval(timerRef.current);
