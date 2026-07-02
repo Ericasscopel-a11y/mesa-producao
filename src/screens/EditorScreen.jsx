@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { ChevronLeft, Plus, Type, Image as ImageIcon, X, Trash2, Link2, Check, Loader } from "lucide-react";
+import { ChevronLeft, Plus, Type, Image as ImageIcon, X, Trash2, Link2, Check, Loader, Bold, Italic, Underline, Highlighter, List, RemoveFormatting } from "lucide-react";
 import { C, PL, statusFromStages } from "../theme";
 import { PlatBadge, StatusPill } from "../components/ui";
 import StageChecklist from "../components/StageChecklist";
@@ -7,6 +7,64 @@ import { compressImage } from "../lib/media";
 
 let blockSeq = 0;
 const newId = () => `b${Date.now()}_${blockSeq++}`;
+
+// Converte texto puro (dos blocos antigos) em HTML seguro
+const escapeHtml = (s) =>
+  String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
+
+/* ── Barra de formatação (aplica na seleção) ─────────────────────── */
+function FormatToolbar() {
+  // preventDefault no mousedown mantém a seleção do texto ao clicar no botão
+  const apply = (e, cmd, val) => {
+    e.preventDefault();
+    try { document.execCommand(cmd, false, val); } catch {}
+  };
+  const btn = { display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 4, background: "none", border: "none", cursor: "pointer", borderRadius: 8, padding: "7px 9px", color: C.text, fontSize: 13 };
+  const tools = [
+    { title: "Negrito", icon: <Bold size={15} />, cmd: "bold" },
+    { title: "Itálico", icon: <Italic size={15} />, cmd: "italic" },
+    { title: "Sublinhado", icon: <Underline size={15} />, cmd: "underline" },
+    { title: "Grifar (marca-texto)", icon: <Highlighter size={15} color={C.gold} />, cmd: "hiliteColor", val: "#F8E6A0" },
+    { title: "Fonte serifada", icon: <span style={{ fontFamily: C.serif, fontWeight: 700, fontSize: 14, lineHeight: 1 }}>Aa</span>, cmd: "fontName", val: "Fraunces" },
+    { title: "Lista (bullet points)", icon: <List size={15} />, cmd: "insertUnorderedList" },
+    { title: "Limpar formatação", icon: <RemoveFormatting size={15} />, cmd: "removeFormat" },
+  ];
+  return (
+    <div style={{
+      position: "sticky", top: 0, zIndex: 40, display: "flex", alignItems: "center", gap: 2,
+      background: "#FFFFFF", border: `1px solid ${C.border}`, borderRadius: 12,
+      padding: "3px 6px", marginBottom: 16, boxShadow: C.sh, width: "fit-content", maxWidth: "100%", overflowX: "auto",
+    }}>
+      {tools.map((t, i) => (
+        <button key={i} title={t.title} onMouseDown={(e) => apply(e, t.cmd, t.val)}
+          onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(43,22,13,0.06)")}
+          onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
+          style={btn}>
+          {t.icon}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/* Bloco de texto rico (contentEditable, não controlado — preserva o cursor) */
+function RichBlock({ block, onInput }) {
+  return (
+    <div
+      className="editor-rich"
+      contentEditable
+      suppressContentEditableWarning
+      data-placeholder="Escreva aqui…"
+      ref={(el) => {
+        if (el && el.dataset.init !== "1") {
+          el.innerHTML = block.html != null ? block.html : escapeHtml(block.text || "");
+          el.dataset.init = "1";
+        }
+      }}
+      onInput={(e) => onInput(e.currentTarget.innerHTML)}
+    />
+  );
+}
 
 /* Página completa do conteúdo (estilo Notion):
    título editável, etapas, e blocos de texto/imagem com salvamento automático. */
@@ -144,13 +202,17 @@ export default function EditorScreen({ item, onSave, onBack, onDelete, isDesktop
         </div>
       )}
 
-      <div style={{ borderTop: `1px solid ${C.border}`, marginBottom: 20 }} />
+      <div style={{ borderTop: `1px solid ${C.border}`, marginBottom: 16 }} />
+
+      {/* Barra de formatação (selecione o texto e clique) */}
+      <FormatToolbar />
 
       {/* Blocos do documento */}
       {blocks.length === 0 && (
         <p style={{ color: C.muted, fontSize: 14, lineHeight: 1.6, marginTop: 0 }}>
           Escreva aqui o seu conteúdo — roteiro, legenda, texto dos slides…
           Use <b>+ Texto</b> e <b>+ Imagem</b> abaixo para montar a página do seu jeito.
+          Para formatar, <b>selecione o texto</b> e use a barra acima.
         </p>
       )}
 
@@ -159,15 +221,7 @@ export default function EditorScreen({ item, onSave, onBack, onDelete, isDesktop
           <div key={b.id} style={{ position: "relative", marginBottom: 14 }} className="anim-fade-up">
             {b.type === "text" ? (
               <div style={{ display: "flex", gap: 6, alignItems: "flex-start" }}>
-                <textarea
-                  className="editor-block"
-                  rows={1}
-                  ref={autoGrow}
-                  onInput={(e) => autoGrow(e.target)}
-                  value={b.text || ""}
-                  placeholder="Escreva aqui…"
-                  onChange={(e) => updBlock(b.id, { text: e.target.value })}
-                />
+                <RichBlock block={b} onInput={(html) => updBlock(b.id, { html })} />
                 <button onClick={() => removeBlock(b.id)} title="Remover bloco" className="press" style={{ background: "none", border: "none", cursor: "pointer", padding: 4, opacity: 0.5, flexShrink: 0 }}>
                   <X size={14} color={C.muted} />
                 </button>
