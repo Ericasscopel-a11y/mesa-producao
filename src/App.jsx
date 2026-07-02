@@ -71,10 +71,16 @@ function Dashboard({ user, name, signOut }) {
   };
 
   const handleSave = async (item) => {
-    const error = editItem ? await updateItem(editItem.id, item) : await addItem(item);
+    if (editItem) {
+      const error = await updateItem(editItem.id, item);
+      if (!error) closeModal();
+      return error;
+    }
+    const { error, item: created } = await addItem(item);
     if (!error) {
       if (fromIdea) await delIdea(fromIdea.id); // a ideia virou conteúdo
       closeModal();
+      if (created) openEditor(created); // abre direto a página para escrever o conteúdo
     }
     return error;
   };

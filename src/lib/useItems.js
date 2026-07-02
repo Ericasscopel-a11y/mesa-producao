@@ -76,8 +76,12 @@ export function useItems(userId) {
       .insert(toRow(item, userId))
       .select()
       .single();
-    if (!error && data) setItems((prev) => [fromRow(data), ...prev]);
-    return error;
+    if (!error && data) {
+      const created = fromRow(data);
+      setItems((prev) => [created, ...prev]);
+      return { error: null, item: created };
+    }
+    return { error, item: null };
   };
 
   const updateItem = async (id, item) => {

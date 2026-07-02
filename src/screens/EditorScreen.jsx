@@ -16,6 +16,7 @@ export default function EditorScreen({ item, onSave, onBack, onDelete, isDesktop
     document: (item.document || []).map((b) => ({ id: b.id || newId(), ...b })),
   }));
   const [saveState, setSaveState] = useState("saved"); // saved | saving | error
+  const [saveError, setSaveError] = useState(null);
   const timerRef = useRef(null);
   const draftRef = useRef(draft);
   draftRef.current = draft;
@@ -27,7 +28,17 @@ export default function EditorScreen({ item, onSave, onBack, onDelete, isDesktop
     timerRef.current = setTimeout(async () => {
       const d = draftRef.current;
       const error = await onSave(d.id, d);
-      setSaveState(error ? "error" : "saved");
+      if (error) {
+        // Erro mais comum: o banco ainda não tem as colunas novas
+        const msg = /column|does not exist|schema|relation/i.test(error.message || "")
+          ? "Falta atualizar o banco: rode o SQL de atualização no Supabase (SQL Editor)."
+          : error.message || "Verifique a conexão.";
+        setSaveError(msg);
+        setSaveState("error");
+      } else {
+        setSaveError(null);
+        setSaveState("saved");
+      }
     }, 900);
   }, [onSave]);
 
@@ -69,6 +80,7 @@ export default function EditorScreen({ item, onSave, onBack, onDelete, isDesktop
   const maxW = 720;
 
   return (
+    <div style={{ background: "#FFFFFF", minHeight: "100vh" }}>
     <div className="anim-fade-up" style={{ maxWidth: maxW, margin: "0 auto", padding: pad }}>
       {/* Topo: voltar + estado do salvamento + excluir */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 22 }}>
@@ -79,13 +91,20 @@ export default function EditorScreen({ item, onSave, onBack, onDelete, isDesktop
           <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12.5, color: saveState === "error" ? "#9A2B0E" : C.muted }}>
             {saveState === "saving" && <><Loader size={13} className="spin" /> Salvando…</>}
             {saveState === "saved" && <><Check size={14} color="#2f7a4f" /> Salvo</>}
-            {saveState === "error" && "Erro ao salvar — verifique a conexão"}
+            {saveState === "error" && "Erro ao salvar"}
           </span>
           <button onClick={() => onDelete(draft.id)} title="Excluir conteúdo" className="press" style={{ background: "rgba(43,22,13,0.06)", border: "none", borderRadius: 10, padding: 8, cursor: "pointer", display: "flex" }}>
             <Trash2 size={16} color={C.muted} />
           </button>
         </div>
       </div>
+
+      {/* Erro de salvamento (detalhe) */}
+      {saveState === "error" && saveError && (
+        <div className="anim-fade-up" style={{ background: "#FBE3DA", color: "#9A2B0E", borderRadius: 12, padding: "11px 14px", fontSize: 13, lineHeight: 1.5, marginBottom: 16 }}>
+          ⚠️ {saveError}
+        </div>
+      )}
 
       {/* Meta */}
       <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 10 }}>
@@ -175,6 +194,7 @@ export default function EditorScreen({ item, onSave, onBack, onDelete, isDesktop
           <input type="file" accept="image/*" multiple style={{ display: "none" }} onChange={addImages} />
         </label>
       </div>
+    </div>
     </div>
   );
 }
