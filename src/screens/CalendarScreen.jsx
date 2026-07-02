@@ -7,7 +7,7 @@ import {
   MONTHS_FULL, WEEKDAYS_LONG, ymd, todayStr, addDays, startOfWeek,
 } from "../lib/dates";
 
-export default function CalendarScreen({ items, detail, setDetail, setShowAdd, onDelete, onEdit, isDesktop }) {
+export default function CalendarScreen({ items, detail, setDetail, setShowAdd, onDelete, onEdit, onOpen, isDesktop }) {
   const [tab, setTab] = useState("semana");
   const [cursor, setCursor] = useState(() => new Date()); // dia/mês em foco
 
@@ -19,7 +19,7 @@ export default function CalendarScreen({ items, detail, setDetail, setShowAdd, o
   return (
     <div style={{ maxWidth: 880, margin: "0 auto" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: isDesktop ? "32px 32px 12px" : "22px 16px 12px" }}>
-        <span style={{ fontWeight: 700, fontSize: 20, color: C.text }}>Calendário</span>
+        <span style={{ fontWeight: 600, fontSize: 22, color: C.text, fontFamily: C.serif, letterSpacing: "-0.01em" }}>Calendário</span>
         <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
           <button style={{ background: "none", border: "none", cursor: "pointer", padding: 4, display: "flex" }}><SlidersHorizontal size={20} color={C.muted} /></button>
           <button onClick={() => setShowAdd(true)} style={{ background: "none", border: "none", cursor: "pointer", padding: 4, display: "flex" }}><Plus size={21} color={C.text} /></button>
@@ -44,7 +44,7 @@ export default function CalendarScreen({ items, detail, setDetail, setShowAdd, o
       {tab === "mês" && <MonthView cursor={cursor} setCursor={setCursor} itemsOn={itemsOn} setDetail={setDetail} />}
       {tab === "dia" && <DayView cursor={cursor} setCursor={setCursor} itemsOn={itemsOn} detail={detail} setDetail={setDetail} />}
 
-      {detail && <DetailPanel item={detail} onClose={() => setDetail(null)} onDelete={onDelete} onEdit={onEdit} />}
+      {detail && <DetailPanel item={detail} onClose={() => setDetail(null)} onDelete={onDelete} onEdit={onEdit} onOpen={onOpen} />}
     </div>
   );
 }

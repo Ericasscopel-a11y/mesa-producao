@@ -24,7 +24,7 @@ export default function Sidebar({ screen, setScreen, setShowAdd }) {
         <div style={{ width: 38, height: 38, borderRadius: 12, background: C.dark, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
           <Sparkles size={20} color={C.gold} />
         </div>
-        <span style={{ fontWeight: 700, fontSize: 16, color: C.text, letterSpacing: "-0.02em" }}>Mesa de Produção</span>
+        <span style={{ fontWeight: 600, fontSize: 17, color: C.text, letterSpacing: "-0.01em", fontFamily: C.serif }}>Mesa de Produção</span>
       </div>
 
       {/* Novo conteúdo */}

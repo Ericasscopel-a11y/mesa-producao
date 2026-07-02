@@ -2,6 +2,7 @@ import { useState } from "react";
 import { C } from "./theme";
 import { useAuth } from "./lib/useAuth";
 import { useItems } from "./lib/useItems";
+import { useIdeas } from "./lib/useIdeas";
 import { useIsDesktop } from "./lib/useMediaQuery";
 import { isConfigured } from "./lib/supabase";
 
@@ -16,6 +17,7 @@ import CalendarScreen from "./screens/CalendarScreen";
 import ContentScreen from "./screens/ContentScreen";
 import AnalyticsScreen from "./screens/AnalyticsScreen";
 import SkillsScreen from "./screens/SkillsScreen";
+import EditorScreen from "./screens/EditorScreen";
 
 function Loader({ text }) {
   return (
@@ -28,7 +30,6 @@ function Loader({ text }) {
 export default function App() {
   const { user, name, loading, signOut } = useAuth();
 
-  // Supabase não configurado → mostra a tela de auth com o aviso amarelo
   if (!isConfigured) return <AuthScreen />;
   if (loading) return <Loader text="Carregando…" />;
   if (!user) return <AuthScreen />;
@@ -39,59 +40,108 @@ export default function App() {
 function Dashboard({ user, name, signOut }) {
   const isDesktop = useIsDesktop();
   const { items, loading, addItem, updateItem, delItem, loadSamples } = useItems(user.id);
+  const { ideas, addIdea, toggleFavorite, delIdea } = useIdeas(user.id);
 
   const [screen, setScreen] = useState("home");
   const [detail, setDetail] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
-  const [editItem, setEditItem] = useState(null); // item sendo editado (null = novo)
+  const [editItem, setEditItem] = useState(null);     // item em edição no modal
+  const [prefill, setPrefill] = useState(null);        // pré-preenchimento (ideia → conteúdo)
+  const [fromIdea, setFromIdea] = useState(null);      // ideia de origem (some após virar conteúdo)
+  const [editorId, setEditorId] = useState(null);      // página do conteúdo aberta
+  const [contentFilter, setContentFilter] = useState(null); // filtro inicial de Conteúdos
 
-  const openNew = () => { setEditItem(null); setShowAdd(true); };
-  const openEdit = (item) => { setDetail(null); setEditItem(item); setShowAdd(true); };
-  const closeModal = () => { setShowAdd(false); setEditItem(null); };
+  const editorItem = editorId ? items.find((i) => i.id === editorId) : null;
+
+  const openNew = () => { setEditItem(null); setPrefill(null); setFromIdea(null); setShowAdd(true); };
+  const openEdit = (item) => { setDetail(null); setEditItem(item); setPrefill(null); setShowAdd(true); };
+  const closeModal = () => { setShowAdd(false); setEditItem(null); setPrefill(null); setFromIdea(null); };
+
+  const openEditor = (item) => { setDetail(null); setEditorId(item.id); };
+  const closeEditor = () => setEditorId(null);
+
+  const openContentFiltered = (filter) => { setContentFilter(filter); setScreen("content"); };
+
+  // Ideia → conteúdo: abre o modal já com o título preenchido
+  const onTransformIdea = (idea) => {
+    setEditItem(null);
+    setPrefill({ title: idea.text });
+    setFromIdea(idea);
+    setShowAdd(true);
+  };
 
   const handleSave = async (item) => {
     const error = editItem ? await updateItem(editItem.id, item) : await addItem(item);
-    if (!error) closeModal(); // só fecha se salvou de verdade
+    if (!error) {
+      if (fromIdea) await delIdea(fromIdea.id); // a ideia virou conteúdo
+      closeModal();
+    }
     return error;
   };
+
   const handleDelete = async (id) => {
     await delItem(id);
     setDetail(null);
+    if (editorId === id) setEditorId(null);
   };
 
-  // setShowAdd é passado aos filhos como "abrir novo conteúdo"
   const screenProps = { items, setDetail, setScreen, setShowAdd: openNew, name, signOut, isDesktop };
 
-  const screens = (
+  const screens = editorItem ? (
+    <EditorScreen
+      key={editorItem.id}
+      item={editorItem}
+      onSave={updateItem}
+      onBack={closeEditor}
+      onDelete={handleDelete}
+      isDesktop={isDesktop}
+    />
+  ) : (
     <>
-      {screen === "home" && <HomeScreen {...screenProps} loadSamples={items.length === 0 ? loadSamples : null} />}
-      {screen === "content" && <ContentScreen items={items} setDetail={setDetail} setShowAdd={openNew} isDesktop={isDesktop} />}
-      {screen === "calendar" && <CalendarScreen items={items} detail={detail} setDetail={setDetail} setShowAdd={openNew} onDelete={handleDelete} onEdit={openEdit} isDesktop={isDesktop} />}
+      {screen === "home" && (
+        <HomeScreen
+          {...screenProps}
+          loadSamples={items.length === 0 ? loadSamples : null}
+          ideas={ideas} addIdea={addIdea} toggleFavorite={toggleFavorite} delIdea={delIdea}
+          onTransformIdea={onTransformIdea} openContentFiltered={openContentFiltered}
+        />
+      )}
+      {screen === "content" && (
+        <ContentScreen
+          key={contentFilter || "todos"}
+          items={items} setDetail={setDetail} setShowAdd={openNew}
+          onOpen={openEditor} onMove={updateItem}
+          isDesktop={isDesktop} initialFilter={contentFilter}
+        />
+      )}
+      {screen === "calendar" && <CalendarScreen items={items} detail={detail} setDetail={setDetail} setShowAdd={openNew} onDelete={handleDelete} onEdit={openEdit} onOpen={openEditor} isDesktop={isDesktop} />}
       {screen === "analytics" && <AnalyticsScreen items={items} isDesktop={isDesktop} />}
       {screen === "skills" && <SkillsScreen isDesktop={isDesktop} />}
 
       {detail && screen !== "calendar" && (
         <div style={{ padding: "0 16px", maxWidth: 880, margin: "0 auto" }}>
-          <DetailPanel item={detail} onClose={() => setDetail(null)} onDelete={handleDelete} onEdit={openEdit} />
+          <DetailPanel item={detail} onClose={() => setDetail(null)} onDelete={handleDelete} onEdit={openEdit} onOpen={openEditor} />
         </div>
       )}
     </>
   );
 
+  const changeScreen = (s) => { setEditorId(null); setContentFilter(null); setScreen(s); };
+
   /* ── Layout desktop: sidebar + área de conteúdo ───────────────── */
   if (isDesktop) {
     return (
       <div style={{ display: "flex", minHeight: "100vh", background: C.bg, fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, sans-serif", WebkitFontSmoothing: "antialiased" }}>
-        <Sidebar screen={screen} setScreen={setScreen} setShowAdd={setShowAdd} />
+        <Sidebar screen={screen} setScreen={changeScreen} setShowAdd={openNew} />
         <main style={{ flex: 1, minWidth: 0, position: "relative" }}>
           {loading ? <Loader text="Carregando seus conteúdos…" /> : screens}
-          {showAdd && <AddModal onClose={closeModal} onSave={handleSave} initial={editItem} />}
+          {showAdd && <AddModal onClose={closeModal} onSave={handleSave} initial={editItem} prefill={prefill} />}
         </main>
       </div>
     );
   }
 
-  /* ── Layout mobile: frame de celular + nav inferior ───────────── */
+  /* ── Layout mobile ────────────────────────────────────────────── */
   return (
     <div style={{
       maxWidth: 430, margin: "0 auto", background: C.bg, minHeight: "100vh",
@@ -102,11 +152,11 @@ function Dashboard({ user, name, signOut }) {
         {loading ? <Loader text="Carregando seus conteúdos…" /> : screens}
       </div>
 
-      <BottomNav screen={screen} setScreen={setScreen} setShowAdd={setShowAdd} />
+      <BottomNav screen={screen} setScreen={changeScreen} setShowAdd={openNew} />
 
       {showAdd && (
         <div style={{ position: "absolute", inset: 0, zIndex: 200 }}>
-          <AddModal onClose={closeModal} onSave={handleSave} initial={editItem} />
+          <AddModal onClose={closeModal} onSave={handleSave} initial={editItem} prefill={prefill} />
         </div>
       )}
     </div>

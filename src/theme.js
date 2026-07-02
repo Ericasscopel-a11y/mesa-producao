@@ -4,7 +4,28 @@ export const C = {
   gold: "#C8A43A", text: "#2B160D", muted: "#9B8070",
   border: "rgba(43,22,13,0.10)", sh: "0 2px 12px rgba(43,22,13,0.08)",
   sh2: "0 8px 24px rgba(43,22,13,0.13)",
+  serif: '"Fraunces", Georgia, serif',
 };
+
+/* Etapas de produção de um conteúdo (checklist).
+   Marcar etapas atualiza o status automaticamente. */
+export const STAGES = [
+  { key: "roteiro",  label: "Roteiro pronto" },
+  { key: "gravacao", label: "Gravado" },
+  { key: "edicao",   label: "Editado" },
+  { key: "agendado", label: "Agendado" },
+  { key: "postado",  label: "Postado" },
+];
+
+// Converte o checklist de etapas no status do conteúdo
+export function statusFromStages(stages) {
+  const done = (stages || []).filter(Boolean).length;
+  if (done >= 5) return "postado";
+  if (done === 4) return "agendado";
+  if (done >= 2) return "em-producao";
+  if (done === 1) return "roteiro-pronto";
+  return "ideia";
+}
 
 export const ST = {
   "em-producao":    { bg: "#F5E8D8", tc: "#7A3D10", label: "Em produção" },

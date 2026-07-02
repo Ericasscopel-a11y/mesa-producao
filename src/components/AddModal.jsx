@@ -12,7 +12,7 @@ const blank = {
   scheduledDate: todayStr(), timeSlot: 0, link: "", images: [], audio: null,
 };
 
-export default function AddModal({ onClose, onSave, initial }) {
+export default function AddModal({ onClose, onSave, initial, prefill }) {
   const isEdit = !!initial;
   const [form, setForm] = useState(() => initial ? {
     title: initial.title || "", platform: initial.platform || "instagram", type: initial.type || "Reels",
@@ -20,7 +20,7 @@ export default function AddModal({ onClose, onSave, initial }) {
     scheduledDate: initial.scheduledDate || todayStr(),
     timeSlot: typeof initial.timeSlot === "number" ? initial.timeSlot : 0,
     link: initial.link || "", images: Array.isArray(initial.images) ? initial.images : [], audio: initial.audio || null,
-  } : { ...blank });
+  } : { ...blank, ...(prefill || {}) });
 
   const [saving, setSaving] = useState(false);
   const [mediaMsg, setMediaMsg] = useState(null);
@@ -109,8 +109,9 @@ export default function AddModal({ onClose, onSave, initial }) {
     setMediaMsg(null);
     setSaving(true);
     try {
+      // Ao editar, preserva as etapas e o documento (página) já existentes
       const payload = isEdit
-        ? { ...form, steps: initial.steps ?? 0, total: initial.total ?? 5 }
+        ? { ...form, steps: initial.steps ?? 0, total: 5, stages: initial.stages, document: initial.document }
         : { ...form, steps: 0, total: 5 };
       const error = await onSave(payload);
       if (error) {

@@ -14,8 +14,82 @@ body {
 }
 
 button { font-family: inherit; }
+textarea { font-family: inherit; }
 
 /* Barra de rolagem discreta */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-thumb { background: rgba(43,22,13,0.18); border-radius: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
+
+/* ── Animações globais ──────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes slideUp {
+  from { transform: translateY(24px); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+@keyframes popIn {
+  0%   { transform: scale(0.94); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes growBar {
+  from { width: 0; }
+}
+
+.anim-fade-up { animation: fadeUp 0.35s ease both; }
+.anim-pop    { animation: popIn 0.25s ease both; }
+.anim-slide  { animation: slideUp 0.3s cubic-bezier(0.2, 0.8, 0.3, 1) both; }
+.grow-bar    { animation: growBar 0.8s cubic-bezier(0.2, 0.8, 0.3, 1) both; }
+
+@keyframes spinKF { to { transform: rotate(360deg); } }
+.spin { animation: spinKF 1s linear infinite; }
+
+/* Cards interativos: leve elevação no hover, resposta ao toque */
+.card-hover {
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(43,22,13,0.14);
+}
+.card-hover:active { transform: scale(0.985); }
+
+.press { transition: transform 0.12s ease, opacity 0.12s ease; }
+.press:active { transform: scale(0.96); }
+
+/* Stagger: filhos entram em sequência */
+.stagger > * { animation: fadeUp 0.35s ease both; }
+.stagger > *:nth-child(1) { animation-delay: 0.02s; }
+.stagger > *:nth-child(2) { animation-delay: 0.06s; }
+.stagger > *:nth-child(3) { animation-delay: 0.10s; }
+.stagger > *:nth-child(4) { animation-delay: 0.14s; }
+.stagger > *:nth-child(5) { animation-delay: 0.18s; }
+.stagger > *:nth-child(6) { animation-delay: 0.22s; }
+.stagger > *:nth-child(7) { animation-delay: 0.26s; }
+.stagger > *:nth-child(8) { animation-delay: 0.30s; }
+
+/* Editor (página do conteúdo) */
+.editor-title {
+  width: 100%; border: none; background: none; outline: none; resize: none;
+  font-family: "Fraunces", Georgia, serif; font-weight: 600;
+  color: #2B160D; line-height: 1.2; padding: 0;
+}
+.editor-block {
+  width: 100%; border: none; background: none; outline: none; resize: none;
+  font-size: 15px; line-height: 1.7; color: #2B160D; padding: 0;
+}
+.editor-block::placeholder { color: rgba(155,128,112,0.6); }
+
+/* Kanban: rolagem horizontal suave */
+.kanban-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; scroll-snap-type: x proximity; }
+.kanban-col { scroll-snap-align: start; }
+.kanban-card { transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s; cursor: grab; }
+.kanban-card:active { cursor: grabbing; }
+.kanban-card.dragging { opacity: 0.45; transform: rotate(1.5deg) scale(1.02); }
+.kanban-col.dragover { background: rgba(165,106,46,0.08); }

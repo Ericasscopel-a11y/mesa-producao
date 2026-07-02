@@ -11,7 +11,7 @@ export default function AnalyticsScreen({ items, isDesktop }) {
 
   return (
     <div style={{ padding: isDesktop ? "32px 32px 16px" : "22px 16px 8px", maxWidth: 880, margin: "0 auto" }}>
-      <span style={{ fontWeight: 700, fontSize: 20, color: C.text, display: "block", marginBottom: 20 }}>Análises</span>
+      <span style={{ fontWeight: 600, fontSize: 22, color: C.text, display: "block", marginBottom: 20, fontFamily: C.serif, letterSpacing: "-0.01em" }}>Análises</span>
 
       <div style={{ background: C.dark, borderRadius: 16, padding: "18px", marginBottom: 16, boxShadow: C.sh2 }}>
         <div style={{ color: "rgba(255,248,239,0.6)", fontSize: 12, marginBottom: 14 }}>TOTAL DE CONTEÚDOS</div>

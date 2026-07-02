@@ -6,6 +6,8 @@ import { displayDate, parseYmd } from "./dates";
 // Converte a linha do banco (snake_case) para o formato usado nas telas (camelCase)
 const fromRow = (r) => {
   const sd = r.scheduled_date || null; // "YYYY-MM-DD"
+  const stages = Array.isArray(r.stages) && r.stages.length === 5 ? r.stages : [false, false, false, false, false];
+  const stepsDone = stages.filter(Boolean).length;
   return {
     id: r.id,
     title: r.title,
@@ -17,11 +19,13 @@ const fromRow = (r) => {
     date: sd ? displayDate(sd) : r.date || "", // texto exibido ("28 JUN")
     dayNum: sd ? parseYmd(sd).getDate() : r.day_num,
     timeSlot: r.time_slot,
-    steps: r.steps,
-    total: r.total,
+    steps: stepsDone,
+    total: 5,
     link: r.link || "",
     images: Array.isArray(r.images) ? r.images : [],
     audio: r.audio || null,
+    document: Array.isArray(r.document) ? r.document : [],
+    stages,
   };
 };
 
@@ -44,6 +48,8 @@ const toRow = (item, userId) => {
     link: item.link?.trim() ? item.link.trim() : null,
     images: Array.isArray(item.images) ? item.images : [],
     audio: item.audio || null,
+    document: Array.isArray(item.document) ? item.document : [],
+    stages: Array.isArray(item.stages) && item.stages.length === 5 ? item.stages : [false, false, false, false, false],
   };
 };
 

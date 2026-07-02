@@ -9,7 +9,7 @@ function safeHref(link) {
   return /^https?:\/\//i.test(v) ? v : `https://${v}`;
 }
 
-export default function DetailPanel({ item, onClose, onDelete, onEdit }) {
+export default function DetailPanel({ item, onClose, onDelete, onEdit, onOpen }) {
   if (!item) return null;
   const pct = Math.round((item.steps / item.total) * 100);
   return (
@@ -81,11 +81,14 @@ export default function DetailPanel({ item, onClose, onDelete, onEdit }) {
       })()}
 
       <div style={{ display: "flex", gap: 10 }}>
-        <button onClick={() => onDelete(item.id)} style={{ flex: 1, background: "rgba(43,22,13,0.06)", border: "none", borderRadius: 12, padding: "12px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: C.muted, fontSize: 13 }}>
-          <Trash2 size={14} /> Excluir
+        <button onClick={() => onDelete(item.id)} className="press" title="Excluir" style={{ background: "rgba(43,22,13,0.06)", border: "none", borderRadius: 12, padding: "12px 14px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: C.muted }}>
+          <Trash2 size={15} />
         </button>
-        <button onClick={() => onEdit?.(item)} style={{ flex: 2, background: C.dark, border: "none", borderRadius: 12, padding: "12px", cursor: "pointer", color: "#FBF6EC", fontWeight: 600, fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", gap: 7 }}>
-          <Pencil size={15} /> Editar conteúdo
+        <button onClick={() => onEdit?.(item)} className="press" style={{ flex: 1, background: "rgba(43,22,13,0.06)", border: "none", borderRadius: 12, padding: "12px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: C.text, fontSize: 13, fontWeight: 600 }}>
+          <Pencil size={14} /> Editar
+        </button>
+        <button onClick={() => onOpen?.(item)} className="press" style={{ flex: 2, background: C.dark, border: "none", borderRadius: 12, padding: "12px", cursor: "pointer", color: "#FBF6EC", fontWeight: 600, fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", gap: 7 }}>
+          Abrir conteúdo →
         </button>
       </div>
     </div>

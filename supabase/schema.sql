@@ -21,6 +21,8 @@ create table if not exists public.content_items (
   images         jsonb default '[]'::jsonb,
   audio          text,
   scheduled_date date,
+  document       jsonb default '[]'::jsonb,
+  stages         jsonb default '[false,false,false,false,false]'::jsonb,
   created_at     timestamptz default now()
 );
 
@@ -29,6 +31,32 @@ alter table public.content_items add column if not exists link           text;
 alter table public.content_items add column if not exists images         jsonb default '[]'::jsonb;
 alter table public.content_items add column if not exists audio          text;
 alter table public.content_items add column if not exists scheduled_date date;
+alter table public.content_items add column if not exists document       jsonb default '[]'::jsonb;
+alter table public.content_items add column if not exists stages         jsonb default '[false,false,false,false,false]'::jsonb;
+
+-- ============================================================
+-- Banco de ideias (notas rápidas da nutri)
+-- ============================================================
+create table if not exists public.ideas (
+  id         uuid primary key default gen_random_uuid(),
+  user_id    uuid not null references auth.users (id) on delete cascade,
+  text       text not null,
+  favorite   boolean default false,
+  created_at timestamptz default now()
+);
+
+create index if not exists ideas_user_id_idx on public.ideas (user_id);
+alter table public.ideas enable row level security;
+
+drop policy if exists "ideias: ler"      on public.ideas;
+drop policy if exists "ideias: criar"    on public.ideas;
+drop policy if exists "ideias: atualizar" on public.ideas;
+drop policy if exists "ideias: apagar"   on public.ideas;
+
+create policy "ideias: ler"      on public.ideas for select using (auth.uid() = user_id);
+create policy "ideias: criar"    on public.ideas for insert with check (auth.uid() = user_id);
+create policy "ideias: atualizar" on public.ideas for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create policy "ideias: apagar"   on public.ideas for delete using (auth.uid() = user_id);
 
 -- Índice para carregar rápido os conteúdos de cada usuária
 create index if not exists content_items_user_id_idx

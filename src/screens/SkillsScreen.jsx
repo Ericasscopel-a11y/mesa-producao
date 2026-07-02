@@ -32,7 +32,7 @@ export default function SkillsScreen({ isDesktop }) {
   const pad = isDesktop ? "32px" : "22px 16px";
   return (
     <div style={{ padding: pad, maxWidth: 880, margin: "0 auto" }}>
-      <span style={{ fontWeight: 700, fontSize: 20, color: C.text, display: "block", marginBottom: 8 }}>Skills</span>
+      <span style={{ fontWeight: 600, fontSize: 22, color: C.text, display: "block", marginBottom: 8, fontFamily: C.serif, letterSpacing: "-0.01em" }}>Skills</span>
       <p style={{ fontSize: 13.5, color: C.muted, lineHeight: 1.55, marginTop: 0, marginBottom: 18 }}>
         Suas skills de criação de conteúdo. Siga a ordem: <b style={{ color: C.text }}>1) Persona → 2) Linha Editorial → 3) Modela Conteúdo</b>. Toque em cada uma para ver os detalhes e baixar o arquivo.
       </p>

@@ -5,7 +5,7 @@ import { PlatBadge, StatusPill, Thumb } from "./ui";
 export default function ContentCard({ item, onClick }) {
   const hasImages = Array.isArray(item.images) && item.images.length > 0;
   return (
-    <div onClick={() => onClick(item)} style={{
+    <div onClick={() => onClick(item)} className="card-hover" style={{
       background: C.card, borderRadius: 16, padding: "12px 14px",
       marginBottom: 10, cursor: "pointer", display: "flex", gap: 12,
       alignItems: "center", boxShadow: C.sh, border: `1px solid ${C.border}`,
