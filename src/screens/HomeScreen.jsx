@@ -2,10 +2,12 @@ import { useState } from "react";
 import { Plus, FileText, Play, Send, CheckCircle2, Lightbulb, Calendar, Sparkles, LogOut, Star, Trash2, ArrowRight } from "lucide-react";
 import { C, ST } from "../theme";
 import ContentCard from "../components/ContentCard";
+import Avatar from "../components/Avatar";
 
 export default function HomeScreen({
   items, setDetail, setScreen, setShowAdd, name, signOut, loadSamples, isDesktop,
   ideas, addIdea, toggleFavorite, delIdea, onTransformIdea, openContentFiltered,
+  avatar, onUploadAvatar,
 }) {
   const [ideaText, setIdeaText] = useState("");
   const [savingIdea, setSavingIdea] = useState(false);
@@ -16,8 +18,6 @@ export default function HomeScreen({
     agendados: items.filter((i) => i.status === "agendado").length,
     postados: items.filter((i) => i.status === "postado").length,
   };
-  const initials = (name || "?").trim().slice(0, 2).toUpperCase();
-
   // Distribuição por status (para a barra do card escuro)
   const dist = Object.keys(ST).map((k) => ({ k, ...ST[k], n: items.filter((i) => i.status === k).length })).filter((d) => d.n > 0);
 
@@ -35,7 +35,7 @@ export default function HomeScreen({
       {/* Header */}
       <div className="anim-fade-up" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 22 }}>
         <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-          <div style={{ width: 44, height: 44, borderRadius: "50%", background: `linear-gradient(135deg, ${C.dark}, #5A3520)`, display: "flex", alignItems: "center", justifyContent: "center", color: "#FBF6EC", fontSize: 13, fontWeight: 700, flexShrink: 0, boxShadow: C.sh }}>{initials}</div>
+          <Avatar src={avatar} name={name} size={46} onUpload={onUploadAvatar} />
           <div>
             <div style={{ fontWeight: 600, fontSize: isDesktop ? 22 : 19, color: C.text, fontFamily: C.serif, letterSpacing: "-0.01em" }}>Olá, {name || "nutri"} 👋</div>
             <div style={{ fontSize: 12.5, color: C.muted }}>Pronta para criar hoje?</div>

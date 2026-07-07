@@ -1,8 +1,9 @@
-import { Home, LayoutGrid, Calendar, BarChart2, Plus, Sparkles, Wand2, LogOut } from "lucide-react";
+import { Home, LayoutGrid, Calendar, BarChart2, Plus, Wand2, LogOut } from "lucide-react";
 import { C } from "../theme";
 import { useAuth } from "../lib/useAuth";
+import Avatar from "./Avatar";
 
-export default function Sidebar({ screen, setScreen, setShowAdd }) {
+export default function Sidebar({ screen, setScreen, setShowAdd, avatar, onUploadAvatar }) {
   const { name, signOut } = useAuth();
   const tabs = [
     { id: "home", icon: <Home size={20} />, label: "Início" },
@@ -11,7 +12,6 @@ export default function Sidebar({ screen, setScreen, setShowAdd }) {
     { id: "analytics", icon: <BarChart2 size={20} />, label: "Análises" },
     { id: "skills", icon: <Wand2 size={20} />, label: "Skills" },
   ];
-  const initials = (name || "?").trim().slice(0, 2).toUpperCase();
 
   return (
     <aside style={{
@@ -19,16 +19,17 @@ export default function Sidebar({ screen, setScreen, setShowAdd }) {
       height: "100vh", position: "sticky", top: 0, display: "flex", flexDirection: "column",
       padding: "24px 16px",
     }}>
-      {/* Logo */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "0 8px", marginBottom: 28 }}>
-        <div style={{ width: 38, height: 38, borderRadius: 12, background: C.dark, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-          <Sparkles size={20} color={C.gold} />
+      {/* Foto da nutri + marca */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "0 8px", marginBottom: 28 }}>
+        <Avatar src={avatar} name={name} size={46} onUpload={onUploadAvatar} />
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontWeight: 600, fontSize: 15.5, color: C.text, fontFamily: C.serif, lineHeight: 1.2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{name || "Minha conta"}</div>
+          <div style={{ fontSize: 11.5, color: C.muted }}>Mesa de Produção</div>
         </div>
-        <span style={{ fontWeight: 600, fontSize: 17, color: C.text, letterSpacing: "-0.01em", fontFamily: C.serif }}>Mesa de Produção</span>
       </div>
 
       {/* Novo conteúdo */}
-      <button onClick={() => setShowAdd(true)} style={{ display: "flex", alignItems: "center", gap: 10, background: C.dark, border: "none", borderRadius: 12, padding: "12px 14px", cursor: "pointer", color: "#FBF6EC", fontWeight: 600, fontSize: 14, marginBottom: 24, boxShadow: C.sh2 }}>
+      <button onClick={() => setShowAdd(true)} className="press" style={{ display: "flex", alignItems: "center", gap: 10, background: C.dark, border: "none", borderRadius: 12, padding: "12px 14px", cursor: "pointer", color: "#FBF6EC", fontWeight: 600, fontSize: 14, marginBottom: 24, boxShadow: C.sh2 }}>
         <Plus size={18} /> Novo conteúdo
       </button>
 
@@ -37,11 +38,12 @@ export default function Sidebar({ screen, setScreen, setShowAdd }) {
         {tabs.map((t) => {
           const active = screen === t.id;
           return (
-            <button key={t.id} onClick={() => setScreen(t.id)} style={{
+            <button key={t.id} onClick={() => setScreen(t.id)} className="press" style={{
               display: "flex", alignItems: "center", gap: 12, border: "none", cursor: "pointer",
               background: active ? "rgba(165,106,46,0.12)" : "transparent",
               borderRadius: 10, padding: "11px 14px", textAlign: "left",
               color: active ? C.accent : C.muted, fontWeight: active ? 600 : 500, fontSize: 14,
+              transition: "all 0.15s",
             }}>
               {t.icon} {t.label}
             </button>
@@ -49,14 +51,10 @@ export default function Sidebar({ screen, setScreen, setShowAdd }) {
         })}
       </nav>
 
-      {/* Usuária + sair */}
-      <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 16, display: "flex", alignItems: "center", gap: 10 }}>
-        <div style={{ width: 36, height: 36, borderRadius: "50%", background: C.dark, color: "#FBF6EC", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{initials}</div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: C.text, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{name || "Minha conta"}</div>
-        </div>
-        <button onClick={signOut} title="Sair" style={{ background: "none", border: "none", cursor: "pointer", padding: 6, display: "flex" }}>
-          <LogOut size={18} color={C.muted} />
+      {/* Sair */}
+      <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 14 }}>
+        <button onClick={signOut} className="press" style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", background: "none", border: "none", cursor: "pointer", padding: "9px 8px", color: C.muted, fontSize: 13.5, fontWeight: 500, borderRadius: 10 }}>
+          <LogOut size={17} /> Sair da conta
         </button>
       </div>
     </aside>

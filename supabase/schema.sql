@@ -35,6 +35,25 @@ alter table public.content_items add column if not exists document       jsonb d
 alter table public.content_items add column if not exists stages         jsonb default '[false,false,false,false,false]'::jsonb;
 
 -- ============================================================
+-- Perfil da nutri (foto)
+-- ============================================================
+create table if not exists public.profiles (
+  user_id    uuid primary key references auth.users (id) on delete cascade,
+  avatar     text,
+  updated_at timestamptz default now()
+);
+
+alter table public.profiles enable row level security;
+
+drop policy if exists "perfil: ler"      on public.profiles;
+drop policy if exists "perfil: criar"    on public.profiles;
+drop policy if exists "perfil: atualizar" on public.profiles;
+
+create policy "perfil: ler"      on public.profiles for select using (auth.uid() = user_id);
+create policy "perfil: criar"    on public.profiles for insert with check (auth.uid() = user_id);
+create policy "perfil: atualizar" on public.profiles for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+-- ============================================================
 -- Banco de ideias (notas rápidas da nutri)
 -- ============================================================
 create table if not exists public.ideas (

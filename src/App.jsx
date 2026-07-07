@@ -3,8 +3,10 @@ import { C } from "./theme";
 import { useAuth } from "./lib/useAuth";
 import { useItems } from "./lib/useItems";
 import { useIdeas } from "./lib/useIdeas";
+import { useProfile } from "./lib/useProfile";
 import { useIsDesktop } from "./lib/useMediaQuery";
 import { isConfigured } from "./lib/supabase";
+import { compressImage } from "./lib/media";
 
 import AuthScreen from "./components/AuthScreen";
 import UpdateNotice from "./components/UpdateNotice";
@@ -42,6 +44,22 @@ function Dashboard({ user, name, signOut }) {
   const isDesktop = useIsDesktop();
   const { items, loading, addItem, updateItem, delItem, loadSamples } = useItems(user.id);
   const { ideas, addIdea, toggleFavorite, delIdea } = useIdeas(user.id);
+  const { avatar, saveAvatar } = useProfile(user.id);
+
+  // Foto de perfil: comprime e salva na conta
+  const onUploadAvatar = async (file) => {
+    try {
+      const dataUrl = await compressImage(file, 320, 0.82);
+      const error = await saveAvatar(dataUrl);
+      if (error) {
+        alert(/relation|does not exist|schema/i.test(error.message || "")
+          ? "Falta atualizar o banco: rode o SQL da tabela de perfil no Supabase (SQL Editor)."
+          : "Não foi possível salvar a foto: " + (error.message || "tente de novo."));
+      }
+    } catch {
+      alert("Não foi possível ler essa imagem. Tente outra foto.");
+    }
+  };
 
   const [screen, setScreen] = useState("home");
   const [detail, setDetail] = useState(null);
@@ -118,6 +136,7 @@ function Dashboard({ user, name, signOut }) {
           loadSamples={items.length === 0 ? loadSamples : null}
           ideas={ideas} addIdea={addIdea} toggleFavorite={toggleFavorite} delIdea={delIdea}
           onTransformIdea={onTransformIdea} openContentFiltered={openContentFiltered}
+          avatar={avatar} onUploadAvatar={onUploadAvatar}
         />
       )}
       {screen === "content" && (
@@ -146,7 +165,7 @@ function Dashboard({ user, name, signOut }) {
   if (isDesktop) {
     return (
       <div style={{ display: "flex", minHeight: "100vh", background: C.bg, fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, sans-serif", WebkitFontSmoothing: "antialiased" }}>
-        <Sidebar screen={screen} setScreen={changeScreen} setShowAdd={openNew} />
+        <Sidebar screen={screen} setScreen={changeScreen} setShowAdd={openNew} avatar={avatar} onUploadAvatar={onUploadAvatar} />
         <main style={{ flex: 1, minWidth: 0, position: "relative" }}>
           {loading ? <Loader text="Carregando seus conteúdos…" /> : screens}
           {showAdd && <AddModal onClose={closeModal} onSave={handleSave} initial={editItem} prefill={prefill} />}
