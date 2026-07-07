@@ -7,6 +7,7 @@ import { useIsDesktop } from "./lib/useMediaQuery";
 import { isConfigured } from "./lib/supabase";
 
 import AuthScreen from "./components/AuthScreen";
+import UpdateNotice from "./components/UpdateNotice";
 import BottomNav from "./components/BottomNav";
 import Sidebar from "./components/Sidebar";
 import AddModal from "./components/AddModal";
@@ -150,6 +151,7 @@ function Dashboard({ user, name, signOut }) {
           {loading ? <Loader text="Carregando seus conteúdos…" /> : screens}
           {showAdd && <AddModal onClose={closeModal} onSave={handleSave} initial={editItem} prefill={prefill} />}
         </main>
+        <UpdateNotice />
       </div>
     );
   }
@@ -172,6 +174,8 @@ function Dashboard({ user, name, signOut }) {
           <AddModal onClose={closeModal} onSave={handleSave} initial={editItem} prefill={prefill} />
         </div>
       )}
+
+      <UpdateNotice />
     </div>
   );
 }
