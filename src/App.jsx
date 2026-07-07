@@ -4,6 +4,7 @@ import { useAuth } from "./lib/useAuth";
 import { useItems } from "./lib/useItems";
 import { useIdeas } from "./lib/useIdeas";
 import { useProfile } from "./lib/useProfile";
+import { useGallery } from "./lib/useGallery";
 import { useIsDesktop } from "./lib/useMediaQuery";
 import { isConfigured } from "./lib/supabase";
 import { compressImage } from "./lib/media";
@@ -20,6 +21,7 @@ import CalendarScreen from "./screens/CalendarScreen";
 import ContentScreen from "./screens/ContentScreen";
 import AnalyticsScreen from "./screens/AnalyticsScreen";
 import SkillsScreen from "./screens/SkillsScreen";
+import GalleryScreen from "./screens/GalleryScreen";
 import EditorScreen from "./screens/EditorScreen";
 
 function Loader({ text }) {
@@ -45,6 +47,7 @@ function Dashboard({ user, name, signOut }) {
   const { items, loading, addItem, updateItem, delItem, loadSamples } = useItems(user.id);
   const { ideas, addIdea, toggleFavorite, delIdea } = useIdeas(user.id);
   const { avatar, saveAvatar } = useProfile(user.id);
+  const gallery = useGallery(user.id);
 
   // Foto de perfil: comprime e salva na conta
   const onUploadAvatar = async (file) => {
@@ -150,6 +153,7 @@ function Dashboard({ user, name, signOut }) {
       {screen === "calendar" && <CalendarScreen items={items} detail={detail} setDetail={setDetail} setShowAdd={openNew} onAddOnDate={openNewOnDate} onDelete={handleDelete} onEdit={openEdit} onOpen={openEditor} isDesktop={isDesktop} />}
       {screen === "analytics" && <AnalyticsScreen items={items} isDesktop={isDesktop} />}
       {screen === "skills" && <SkillsScreen isDesktop={isDesktop} />}
+      {screen === "gallery" && <GalleryScreen {...gallery} isDesktop={isDesktop} />}
 
       {detail && screen !== "calendar" && (
         <div style={{ padding: "0 16px", maxWidth: 880, margin: "0 auto" }}>

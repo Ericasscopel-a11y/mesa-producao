@@ -54,6 +54,30 @@ create policy "perfil: criar"    on public.profiles for insert with check (auth.
 create policy "perfil: atualizar" on public.profiles for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
 -- ============================================================
+-- Galeria de fotos (organizada por tags)
+-- ============================================================
+create table if not exists public.gallery_photos (
+  id         uuid primary key default gen_random_uuid(),
+  user_id    uuid not null references auth.users (id) on delete cascade,
+  src        text not null,
+  tags       text[] default '{}',
+  created_at timestamptz default now()
+);
+
+create index if not exists gallery_photos_user_id_idx on public.gallery_photos (user_id);
+alter table public.gallery_photos enable row level security;
+
+drop policy if exists "galeria: ler"      on public.gallery_photos;
+drop policy if exists "galeria: criar"    on public.gallery_photos;
+drop policy if exists "galeria: atualizar" on public.gallery_photos;
+drop policy if exists "galeria: apagar"   on public.gallery_photos;
+
+create policy "galeria: ler"      on public.gallery_photos for select using (auth.uid() = user_id);
+create policy "galeria: criar"    on public.gallery_photos for insert with check (auth.uid() = user_id);
+create policy "galeria: atualizar" on public.gallery_photos for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create policy "galeria: apagar"   on public.gallery_photos for delete using (auth.uid() = user_id);
+
+-- ============================================================
 -- Banco de ideias (notas rápidas da nutri)
 -- ============================================================
 create table if not exists public.ideas (

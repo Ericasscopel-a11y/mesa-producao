@@ -1,4 +1,4 @@
-import { Home, LayoutGrid, Calendar, BarChart2, Plus, Wand2 } from "lucide-react";
+import { Home, LayoutGrid, Calendar, BarChart2, Plus, Wand2, Images } from "lucide-react";
 import { C } from "../theme";
 
 export default function BottomNav({ screen, setScreen, setShowAdd }) {
@@ -6,12 +6,13 @@ export default function BottomNav({ screen, setScreen, setShowAdd }) {
     { id: "home", icon: <Home size={20} />, label: "Início" },
     { id: "content", icon: <LayoutGrid size={20} />, label: "Conteúdos" },
     { id: "calendar", icon: <Calendar size={20} />, label: "Calendário" },
+    { id: "gallery", icon: <Images size={20} />, label: "Galeria" },
     { id: "analytics", icon: <BarChart2 size={20} />, label: "Análises" },
     { id: "skills", icon: <Wand2 size={20} />, label: "Skills" },
   ];
   return (
     <div style={{ background: C.card, borderTop: `0.5px solid ${C.border}`, display: "flex", paddingBottom: 8 }}>
-      {[tabs[0], tabs[1], "plus", tabs[2], tabs[3], tabs[4]].map((n) => {
+      {[tabs[0], tabs[1], "plus", tabs[2], tabs[3], tabs[4], tabs[5]].map((n) => {
         if (n === "plus") return (
           <div key="plus" style={{ flex: 1, display: "flex", justifyContent: "center", paddingTop: 4 }}>
             <button onClick={() => setShowAdd(true)} style={{ width: 50, height: 50, borderRadius: "50%", background: C.dark, border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transform: "translateY(-10px)", boxShadow: C.sh2 }}>
