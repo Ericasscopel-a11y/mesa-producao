@@ -1,4 +1,4 @@
-import { Users, BookOpen, Wand2, CalendarDays, Feather } from "lucide-react";
+import { Users, BookOpen, Wand2, CalendarDays, Feather, Camera } from "lucide-react";
 
 // Conteúdo bruto dos arquivos .md das skills (Vite: ?raw vira string) — usado no download
 import personaRaw from "./skills/persona-nutri-builder.md?raw";
@@ -6,6 +6,7 @@ import linhaRaw from "./skills/linha-editorial-nutri.md?raw";
 import modelaRaw from "./skills/modela-conteudo-nutri.md?raw";
 import planejamentoRaw from "./skills/planejamento-mensal-conteudo.md?raw";
 import humanizerRaw from "./skills/humanizer.md?raw";
+import rotinaRaw from "./skills/rotina-em-conteudo.md?raw";
 
 // Descrições (texto que a nutri lê) — escritas pela Daniela.
 const personaDesc = `
@@ -119,10 +120,28 @@ Você manda o texto (legenda, roteiro, carrossel, e-mail) e pede para humanizar.
 Use como último passo antes de publicar qualquer conteúdo criado com IA. É o pente-fino que faz o texto parecer seu.
 `.trim();
 
+const rotinaDesc = `
+## Para que serve
+Para transformar o seu dia a dia em conteúdo — sem precisar inventar nada. A marmita que você montou, o print de uma mensagem de paciente, o bastidor do consultório, o café da manhã tranquilo: tudo isso já é matéria-prima de post. Essa skill pega o momento vivido e devolve o conteúdo pronto.
+
+## Como funciona
+Você manda o momento — uma foto, um print, um vídeo ou só a descrição do que aconteceu. A skill lê o que aquele momento comunica e te oferece de 3 a 5 ângulos possíveis (educativo, conexão, autoridade, coerência, prova social, venda suave…), cada um com um gancho de exemplo. Você escolhe o ângulo — e só então ela cria o conteúdo completo. O post nasce seu, não da IA.
+
+## O que ela gera
+Depois da escolha do ângulo, o conteúdo pronto em Reels ou Carrossel:
+
+- Gancho para os 3 primeiros segundos (texto na tela + fala)
+- Roteiro de Reels com marcação de tempo, ou slides de Carrossel numerados
+- Legenda completa em tom de conversa, pronta para copiar
+- CTA específico (comentário, salvar ou DM)
+
+Com regras de humanização embutidas (frases curtas, sem clichês de IA, sem exclamação no gancho) e respeito ao CFN: nada de antes e depois nem identificação de paciente.
+`.trim();
+
 // Nota geral, exibida no fim da lista.
 export const SKILLS_OUTRO = `
-## Como as cinco funcionam juntas
-**Persona** define com quem você fala. **Linha editorial** define sobre o que você fala. **Planejamento mensal** transforma isso no seu calendário do mês, com ganchos e copys prontos. **Modelagem** define como você transforma qualquer referência em conteúdo original. **Humanizer** é o pente-fino final: revisa qualquer texto para soar como você, não como IA.
+## Como as seis funcionam juntas
+**Persona** define com quem você fala. **Linha editorial** define sobre o que você fala. **Planejamento mensal** transforma isso no seu calendário do mês, com ganchos e copys prontos. **Modelagem** transforma referências de outros criadores em conteúdo original. **Rotina em conteúdo** transforma o seu próprio dia a dia em post. **Humanizer** é o pente-fino final: revisa qualquer texto para soar como você, não como IA.
 
 Quanto mais skills você tiver instaladas no seu projeto, menos você precisa explicar ao Claude — e mais rápido sai o conteúdo pronto.
 `.trim();
@@ -169,9 +188,19 @@ export const SKILLS = [
     raw: modelaRaw,
   },
   {
+    id: "rotina-em-conteudo",
+    icon: Camera,
+    step: 5,
+    title: "Rotina em Conteúdo",
+    subtitle: "Seu dia a dia virando post",
+    description: rotinaDesc,
+    file: "rotina-em-conteudo.md",
+    raw: rotinaRaw,
+  },
+  {
     id: "humanizer",
     icon: Feather,
-    step: 5,
+    step: 6,
     title: "Humanizer",
     subtitle: "Revise o texto para não soar IA",
     description: humanizerDesc,
