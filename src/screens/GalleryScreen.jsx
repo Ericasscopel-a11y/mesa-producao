@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Plus, X, Trash2, Tag, Loader, Images, Check } from "lucide-react";
+import { Plus, X, Trash2, Tag, Loader, Images, Check, Download } from "lucide-react";
 import { C } from "../theme";
 
 // Sugestões iniciais — a nutri pode criar quantas tags novas quiser
@@ -24,20 +24,22 @@ export default function GalleryScreen({ photos, loading, addPhotos, updateTags, 
   const openPhoto = selected ? photos.find((p) => p.id === selected) : null;
 
   const onUpload = async (e) => {
-    const files = e.target.files;
+    // Copia a lista ANTES de limpar o input (limpar primeiro esvazia a seleção em alguns navegadores)
+    const files = Array.from(e.target.files || []);
     e.target.value = "";
-    if (!files?.length) return;
+    if (!files.length) return;
     setMsg(null);
     setUploading(true);
     // Se um filtro estiver ativo, as fotos novas já entram com essa tag
     const { error, count } = await addPhotos(files, filter ? [filter] : []);
     setUploading(false);
     if (error) {
-      setMsg(/relation|does not exist|schema/i.test(error.message || "")
+      setMsg({ type: "error", text: /relation|does not exist|schema/i.test(error.message || "")
         ? "Falta atualizar o banco: rode o SQL da galeria no Supabase (SQL Editor)."
-        : "Não foi possível enviar: " + (error.message || "tente de novo."));
-    } else if (count) {
-      setMsg(null);
+        : "Não foi possível enviar: " + (error.message || "tente de novo.") });
+    } else {
+      setMsg({ type: "ok", text: `${count} foto${count > 1 ? "s" : ""} adicionada${count > 1 ? "s" : ""} ✓` });
+      setTimeout(() => setMsg((m) => (m?.type === "ok" ? null : m)), 3500);
     }
   };
 
@@ -59,7 +61,11 @@ export default function GalleryScreen({ photos, loading, addPhotos, updateTags, 
       </p>
 
       {msg && (
-        <div className="anim-fade-up" style={{ background: "#FBE3DA", color: "#9A2B0E", borderRadius: 12, padding: "11px 14px", fontSize: 13, lineHeight: 1.5, marginBottom: 14 }}>⚠️ {msg}</div>
+        <div className="anim-fade-up" style={{
+          background: msg.type === "ok" ? "#D8EDE0" : "#FBE3DA",
+          color: msg.type === "ok" ? "#1E5C38" : "#9A2B0E",
+          borderRadius: 12, padding: "11px 14px", fontSize: 13, lineHeight: 1.5, marginBottom: 14, fontWeight: 600,
+        }}>{msg.type === "ok" ? "" : "⚠️ "}{msg.text}</div>
       )}
 
       {/* Filtro por tag */}
@@ -148,6 +154,16 @@ function PhotoPanel({ photo, usedTags, onClose, onTags, onDelete }) {
   };
   const removeTag = (t) => onTags(tags.filter((x) => x !== t));
 
+  // Baixa a foto para o aparelho (útil na hora de montar o post)
+  const download = () => {
+    const a = document.createElement("a");
+    a.href = photo.src;
+    a.download = `foto-${tags[0] || "galeria"}-${String(photo.id).slice(0, 6)}.jpg`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
+
   return (
     <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(43,22,13,0.55)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 300, padding: 16 }} className="anim-fade-up">
       <div onClick={(e) => e.stopPropagation()} className="anim-pop" style={{ background: C.card, borderRadius: 20, width: "100%", maxWidth: 480, maxHeight: "92vh", overflowY: "auto", boxShadow: C.sh2 }}>
@@ -201,9 +217,14 @@ function PhotoPanel({ photo, usedTags, onClose, onTags, onDelete }) {
             </div>
           )}
 
-          <button onClick={onDelete} className="press" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, width: "100%", background: "rgba(43,22,13,0.06)", border: "none", borderRadius: 12, padding: "11px", cursor: "pointer", color: "#9A2B0E", fontSize: 13, fontWeight: 600 }}>
-            <Trash2 size={14} /> Excluir foto
-          </button>
+          <div style={{ display: "flex", gap: 10 }}>
+            <button onClick={download} className="press" style={{ flex: 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 7, background: C.dark, border: "none", borderRadius: 12, padding: "12px", cursor: "pointer", color: "#FBF6EC", fontSize: 13.5, fontWeight: 700 }}>
+              <Download size={15} /> Baixar foto
+            </button>
+            <button onClick={onDelete} className="press" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 7, background: "rgba(43,22,13,0.06)", border: "none", borderRadius: 12, padding: "12px", cursor: "pointer", color: "#9A2B0E", fontSize: 13, fontWeight: 600 }}>
+              <Trash2 size={14} /> Excluir
+            </button>
+          </div>
         </div>
       </div>
     </div>
