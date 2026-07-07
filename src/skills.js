@@ -1,10 +1,11 @@
-import { Users, BookOpen, Wand2, CalendarDays } from "lucide-react";
+import { Users, BookOpen, Wand2, CalendarDays, Feather } from "lucide-react";
 
 // Conteúdo bruto dos arquivos .md das skills (Vite: ?raw vira string) — usado no download
 import personaRaw from "./skills/persona-nutri-builder.md?raw";
 import linhaRaw from "./skills/linha-editorial-nutri.md?raw";
 import modelaRaw from "./skills/modela-conteudo-nutri.md?raw";
 import planejamentoRaw from "./skills/planejamento-mensal-conteudo.md?raw";
+import humanizerRaw from "./skills/humanizer.md?raw";
 
 // Descrições (texto que a nutri lê) — escritas pela Daniela.
 const personaDesc = `
@@ -102,10 +103,26 @@ Um plano de conteúdo completo com:
 Você instala essa skill no seu projeto Claude e, toda vez que for planejar um novo mês, é só ativar. Ela já sabe com quem você está falando — e entrega o plano pronto para executar.
 `.trim();
 
+const humanizerDesc = `
+## Para que serve
+Para o seu conteúdo não parecer escrito por IA. Depois de criar legendas, roteiros e carrosséis com o Claude, sobram marcas típicas de texto de robô: travessões em excesso, palavras infladas ("jornada", "impulsionar", "mergulhar"), listas de três, conclusões genéricas e animadas demais. Essa skill caça e remove esses sinais.
+
+## Como funciona
+Você manda o texto (legenda, roteiro, carrossel, e-mail) e pede para humanizar. A skill compara com um guia de mais de 30 padrões de escrita de IA — baseado no guia "Signs of AI writing" da Wikipédia — reescreve o que soa artificial e devolve a versão final. Se você enviar um exemplo de texto seu junto, ela calibra a reescrita para a sua voz.
+
+## O que ela gera
+- Um rascunho reescrito, uma checagem final ("o que ainda soa IA aqui?") e a versão definitiva
+- Texto sem travessões, sem vícios de vocabulário de IA e sem tom de vendedor animado
+- Mantém tudo o que o original diz: reescreve, não corta
+- Na sua voz, quando você fornece um exemplo do seu jeito de escrever
+
+Use como último passo antes de publicar qualquer conteúdo criado com IA. É o pente-fino que faz o texto parecer seu.
+`.trim();
+
 // Nota geral, exibida no fim da lista.
 export const SKILLS_OUTRO = `
-## Como as quatro funcionam juntas
-**Persona** define com quem você fala. **Linha editorial** define sobre o que você fala. **Planejamento mensal** transforma isso no seu calendário do mês, com ganchos e copys prontos. **Modelagem** define como você transforma qualquer referência em conteúdo original que serve a quem você fala e se encaixa no que você decidiu falar.
+## Como as cinco funcionam juntas
+**Persona** define com quem você fala. **Linha editorial** define sobre o que você fala. **Planejamento mensal** transforma isso no seu calendário do mês, com ganchos e copys prontos. **Modelagem** define como você transforma qualquer referência em conteúdo original. **Humanizer** é o pente-fino final: revisa qualquer texto para soar como você, não como IA.
 
 Quanto mais skills você tiver instaladas no seu projeto, menos você precisa explicar ao Claude — e mais rápido sai o conteúdo pronto.
 `.trim();
@@ -150,5 +167,15 @@ export const SKILLS = [
     description: modelaDesc,
     file: "modela-conteudo-nutri.md",
     raw: modelaRaw,
+  },
+  {
+    id: "humanizer",
+    icon: Feather,
+    step: 5,
+    title: "Humanizer",
+    subtitle: "Revise o texto para não soar IA",
+    description: humanizerDesc,
+    file: "humanizer.md",
+    raw: humanizerRaw,
   },
 ];
